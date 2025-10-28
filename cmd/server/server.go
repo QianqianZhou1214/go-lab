@@ -10,6 +10,8 @@ import (
 )
 
 type GinServer interface {
+	Start(ctx context.Context, httpAddress string) error
+	Shutdown(ctx context.Context) error
 }
 
 type GinServerBuilder struct {
