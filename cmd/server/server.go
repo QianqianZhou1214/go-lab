@@ -46,3 +46,11 @@ func (gs *ginServer) Start(ctx context.Context, httpAddress string) error {
 	logrus.Infof("Https server is running on port %s", httpAddress)
 	return nil
 }
+
+func (gs *ginServer) Shutdown(ctx context.Context) error {
+	if err := gs.server.Shutdown(ctx); err != nil {
+		logrus.Fatalf("Server shutdown %s", err)
+	}
+	logrus.Info("Server exited")
+	return nil
+}
