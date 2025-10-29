@@ -16,6 +16,11 @@ func Execute() {
 
 	ctx := context.Background()
 	config.LoadEnvironment()
+	_, err := config.SetUpDatabase()
+	if err != nil {
+		logrus.Fatalf("Error setting up db %v", err)
+	}
+
 	go func() {
 		if err := server.Start(ctx, os.Getenv(config.AppPort)); err != nil {
 			logrus.Errorf("Error starting server: %v", err)
