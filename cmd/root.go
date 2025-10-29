@@ -1,1 +1,33 @@
 package cmd
+
+import (
+	"context"
+	"os"
+	"rest-api/cmd/server"
+	"rest-api/config"
+	"time"
+
+	"github.com/sirupsen/logrus"
+)
+
+func Execute() {
+	builder := server.NewGinServerBuilder() //a new instance of server builder
+	server := builder.Build()               //build a new gin server instance using the Build()
+
+	ctx := context.Background()
+	config.LoadEnvironment()
+	go func() {
+		if err := server.Start(ctx, os.Getenv(config.AppPort)); err != nil {
+			logrus.Errorf("Error starting server: %v", err)
+		}
+	}()
+
+	<-ctx.Done()
+	logrus.Info("Server stopped")
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		logrus.Errorf("Error stopping the server: %v", err)
+	}
+}
