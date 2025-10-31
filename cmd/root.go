@@ -5,6 +5,7 @@ import (
 	"os"
 	"rest-api/cmd/server"
 	"rest-api/config"
+	"rest-api/provider"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -16,10 +17,12 @@ func Execute() {
 
 	ctx := context.Background()
 	config.LoadEnvironment()
-	_, err := config.SetUpDatabase()
+	db, err := config.SetUpDatabase()
 	if err != nil {
 		logrus.Fatalf("Error setting up db %v", err)
 	}
+
+	provider.NewProvider(db, server)
 
 	go func() {
 		if err := server.Start(ctx, os.Getenv(config.AppPort)); err != nil {
